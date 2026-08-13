@@ -1,0 +1,185 @@
+/*
+ * 2026 Corne -- ZMK port of the QMK "hunter" keymap  (v1.5)
+ * Copyright 2026 Hunter
+ * SPDX-License-Identifier: MIT
+ *
+ * Shield: corne (42 keys, 3x6+3)   Board: nice!nano
+ *
+ * Key positions, for combos and hold-trigger lists:
+ *
+ *    0  1  2  3  4  5      6  7  8  9 10 11
+ *   12 13 14 15 16 17     18 19 20 21 22 23
+ *   24 25 26 27 28 29     30 31 32 33 34 35
+ *            36 37 38     39 40 41
+ */
+
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/bt.h>
+#include <dt-bindings/zmk/outputs.h>
+#include <dt-bindings/zmk/rgb.h>
+
+#define BASE 0
+#define SYM  1
+#define NAV  2
+#define SYS  3
+
+/* Every key on the right half, plus all six thumbs. A left-hand home row mod
+ * may only resolve as a hold when one of these is the next key -- this is the
+ * ZMK equivalent of QMK's CHORDAL_HOLD opposite-hands rule. Thumbs are
+ * included so Alt+Enter and Hyper+Space still chord with either hand. */
+#define RIGHT_HAND_AND_THUMBS  6 7 8 9 10 11 18 19 20 21 22 23 30 31 32 33 34 35 36 37 38 39 40 41
+
+/ {
+    behaviors {
+        /* ------------------------------------------------------------------
+         * Home row mods, one behavior per finger so the tapping terms match
+         * the wired board exactly (pinky 220, ring 210, middle 200).
+         *
+         *   flavor = "balanced"        -> QMK PERMISSIVE_HOLD
+         *   require-prior-idle-ms      -> QMK FLOW_TAP_TERM
+         *   hold-trigger-key-positions -> QMK CHORDAL_HOLD
+         *   quick-tap-ms omitted       -> QMK QUICK_TAP_TERM 0
+         * ------------------------------------------------------------------ */
+        hmp: home_row_pinky {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "balanced";
+            tapping-term-ms = <220>;
+            require-prior-idle-ms = <150>;
+            bindings = <&kp>, <&kp>;
+            hold-trigger-key-positions = <RIGHT_HAND_AND_THUMBS>;
+            hold-trigger-on-release;
+        };
+
+        hmr: home_row_ring {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "balanced";
+            tapping-term-ms = <210>;
+            require-prior-idle-ms = <150>;
+            bindings = <&kp>, <&kp>;
+            hold-trigger-key-positions = <RIGHT_HAND_AND_THUMBS>;
+            hold-trigger-on-release;
+        };
+
+        hmm: home_row_middle {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "balanced";
+            tapping-term-ms = <200>;
+            require-prior-idle-ms = <150>;
+            bindings = <&kp>, <&kp>;
+            hold-trigger-key-positions = <RIGHT_HAND_AND_THUMBS>;
+            hold-trigger-on-release;
+        };
+
+        /* Thumbs: fast, and exempt from the opposite-hands rule. */
+        thm: thumb_mod {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "balanced";
+            tapping-term-ms = <160>;
+            bindings = <&kp>, <&kp>;
+        };
+    };
+
+    combos {
+        compatible = "zmk,combos";
+
+        /* Brackets, right hand, base layer only. Timeouts match the wired
+         * board. 'ui' and 'yu' are real letter pairs, so those two are
+         * tighter. If one still misfires, add require-prior-idle-ms = <100>;
+         * to that combo -- it suppresses the combo mid-word. */
+        combo_lpar { key-positions = < 6  7>; bindings = <&kp LPAR>; timeout-ms = <28>; layers = <BASE>; };
+        combo_rpar { key-positions = < 7  8>; bindings = <&kp RPAR>; timeout-ms = <25>; layers = <BASE>; };
+        combo_lbkt { key-positions = <18 19>; bindings = <&kp LBKT>; timeout-ms = <30>; layers = <BASE>; };
+        combo_rbkt { key-positions = <19 20>; bindings = <&kp RBKT>; timeout-ms = <30>; layers = <BASE>; };
+        combo_lbrc { key-positions = <30 31>; bindings = <&kp LBRC>; timeout-ms = <30>; layers = <BASE>; };
+        combo_rbrc { key-positions = <31 32>; bindings = <&kp RBRC>; timeout-ms = <30>; layers = <BASE>; };
+
+        /* Both Shift keys together -> Caps Word.
+         * This is the ZMK stand-in for QMK's BOTH_SHIFTS_TURNS_ON_CAPS_WORD. */
+        combo_caps { key-positions = <24 35>; bindings = <&caps_word>; timeout-ms = <50>; };
+    };
+
+    keymap {
+        compatible = "zmk,keymap";
+
+        base_layer {
+            display-name = "Base";
+// ---------------------------------------------------------------------------
+// |  `  |  Q  |  W  |  E  |  R  |  T  |   |  Y  |  U  |  I  |  O  |  P  | Esc |
+// | Tab |A/Ctl|S/Alt|D/Gui|  F  |  G  |   |  H  |  J  |  K  |  L  |  ;  |  '  |
+// |Shift|  Z  |  X  |  C  |  V  |  B  |   |  N  |  M  |  ,  |  .  |  /  |Shift|
+//                   | Gui | SYM |Ent/Alt|  |Spc/Hyp| Bspc| NAV |
+            bindings = <
+&kp GRAVE  &kp Q          &kp W         &kp E          &kp R  &kp T   &kp Y      &kp U     &kp I      &kp O    &kp P     &kp ESC
+&kp TAB    &hmp LCTRL A   &hmr LALT S   &hmm LGUI D    &kp F  &kp G   &kp H      &kp J     &kp K      &kp L    &kp SEMI  &kp SQT
+&kp LSHFT  &kp Z          &kp X         &kp C          &kp V  &kp B   &kp N      &kp M     &kp COMMA  &kp DOT  &kp FSLH  &kp RSHFT
+                            &kp LGUI  &mo SYM  &thm LALT RET   &thm LS(LC(LA(LGUI))) SPACE  &kp BSPC  &mo NAV
+            >;
+        };
+
+        sym_layer {
+            display-name = "Sym";
+// ---------------------------------------------------------------------------
+// |     |  !  |  @  |  #  |  $  |  %  |   |  ^  |  &  |  *  |  (  |  )  |  \  |
+// |     |1/Ctl|2/Alt|3/Gui|  4  |  5  |   |  6  |  7  |  8  |  9  |  0  |  |  |
+// |     |     |     |     |     |     |   |  -  |  =  |  `  |  [  |  ]  |     |
+            bindings = <
+&trans  &kp EXCL        &kp AT         &kp HASH       &kp DLLR  &kp PRCNT   &kp CARET  &kp AMPS   &kp ASTRK  &kp LPAR  &kp RPAR  &kp BSLH
+&trans  &hmp LCTRL N1   &hmr LALT N2   &hmm LGUI N3   &kp N4    &kp N5      &kp N6     &kp N7     &kp N8     &kp N9    &kp N0    &kp PIPE
+&trans  &none           &none          &none          &none     &none       &kp MINUS  &kp EQUAL  &kp GRAVE  &kp LBKT  &kp RBKT  &trans
+                                    &trans  &trans  &trans        &trans  &trans  &trans
+            >;
+        };
+
+        nav_layer {
+            display-name = "Nav";
+// ---------------------------------------------------------------------------
+// |     | F1  | F2  | F3  | F4  | F5  |   | F6  | F7  | F8  | F9  | F10 |     |
+// |     |Prev |Next |Play |Vol- |Vol+ |   |     |     |     | Up  |     |     |
+// |     |     |     |     |     |     |   |     |     |Left |Down |Rght |     |
+//                   |     | SYS |     |   |     |     |HELD |
+            bindings = <
+&none   &kp F1      &kp F2      &kp F3   &kp F4        &kp F5         &kp F6  &kp F7  &kp F8    &kp F9    &kp F10    &none
+&trans  &kp C_PREV  &kp C_NEXT  &kp C_PP &kp C_VOL_DN  &kp C_VOL_UP   &none   &none   &none     &kp UP    &none      &none
+&none   &none       &none       &none    &none         &none          &none   &none   &kp LEFT  &kp DOWN  &kp RIGHT  &none
+                                    &trans  &mo SYS  &trans        &trans  &trans  &trans
+            >;
+        };
+
+        sys_layer {
+            display-name = "Sys";
+// ---------------------------------------------------------------------------
+// Wireless housekeeping. The wired board uses this layer for RGB; a
+// battery-powered board needs Bluetooth controls far more.
+//
+// |     |     |     |     |     |     |   |     |     |     |     |     |Out  |
+// |     |     |     |     |     |     |   | BT0 | BT1 | BT2 | BT3 | BT4 |BTclr|
+// |     |     |     |     |     |     |   |     |     |     |     |     |Boot |
+//
+// To restore the wired board's RGB controls on the left hand, first set
+// CONFIG_ZMK_RGB_UNDERGLOW=y in corne.conf, then replace the left-hand
+// bindings on rows 2 and 3 with:
+//   &none &rgb_ug RGB_EFF &rgb_ug RGB_HUI &rgb_ug RGB_SAI &rgb_ug RGB_BRI &rgb_ug RGB_SPI
+//   &rgb_ug RGB_TOG &rgb_ug RGB_EFR &rgb_ug RGB_HUD &rgb_ug RGB_SAD &rgb_ug RGB_BRD &rgb_ug RGB_SPD
+            bindings = <
+&none   &none  &none  &none  &none  &none    &none         &none         &none         &none         &none         &out OUT_TOG
+&none   &none  &none  &none  &none  &none    &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4  &bt BT_CLR
+&none   &none  &none  &none  &none  &none    &none         &none         &none         &none         &none         &bootloader
+                                &none  &trans  &none      &none  &none  &none
+            >;
+        };
+    };
+};
+
+/* Caps Word tuning.
+ *
+ * NOTE: ZMK applies the shift only to A-Z, so '-' stays '-' here instead of
+ * becoming '_' the way it does on the QMK board. Keeping MINUS and UNDERSCORE
+ * in the continue list at least means neither one breaks the word. */
+&caps_word {
+    continue-list = <UNDERSCORE MINUS BACKSPACE DELETE>;
+};
