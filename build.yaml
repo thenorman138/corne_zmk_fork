@@ -1,17 +1,13 @@
----
+# Which firmware images GitHub Actions should build.
+#
+# `nice_nano//zmk` is the nice!nano v2 under ZMK's current board naming.
+# If yours is a v1, use `nice_nano@1//zmk` on both lines instead.
+#
+# For a nice!view screen, append the adapter and panel shields:
+#   shield: corne_left nice_view_adapter nice_view
+
 include:
-#  - board: eyelash_corne_left
-#    shield: nice_view
-#    #snippet: zmk-usb-logging    # Uncomment to log over USB.
-  - board: eyelash_corne_right
-    shield: nice_view
-    #snippet: zmk-usb-logging
-  - board: eyelash_corne_left
-    shield: nice_view
-    snippet: studio-rpc-usb-uart
-    cmake-args: -DCONFIG_ZMK_STUDIO=y -DCONFIG_ZMK_STUDIO_LOCKING=n
-    artifact-name: eyelash_corne_studio_left
-  - board: eyelash_corne_left
-    shield: settings_reset
-    #snippet: zmk-usb-logging
- 
+  - board: nice_nano//zmk
+    shield: corne_left
+  - board: nice_nano//zmk
+    shield: corne_right
